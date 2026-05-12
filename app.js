@@ -592,3 +592,7 @@ if ("serviceWorker" in navigator) {
     // The reader still works if browser privacy settings block service workers.
   });
 }
+
+window.addEventListener("load", () => {
+  document.body.classList.add("app-ready");
+});

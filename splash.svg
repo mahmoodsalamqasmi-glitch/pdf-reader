@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1290 2796">
+  <rect width="1290" height="2796" fill="#0f1115"/>
+  <circle cx="645" cy="1240" r="206" fill="#141a24"/>
+  <path d="M548 1080h172l92 92v294H548z" fill="#f4f7fb" stroke="#8cc7ff" stroke-width="18"/>
+  <path d="M720 1080v102h92" fill="#dbeafe" stroke="#8cc7ff" stroke-width="18"/>
+  <rect x="504" y="1274" width="282" height="94" rx="24" fill="#c62828"/>
+  <text x="645" y="1338" text-anchor="middle" font-family="Arial, sans-serif" font-size="54" font-weight="700" fill="#fff">PDF</text>
+  <text x="645" y="1556" text-anchor="middle" font-family="Arial, sans-serif" font-size="58" font-weight="700" fill="#e6e6e6">HUSAINIREADER</text>
+</svg>

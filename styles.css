@@ -3,6 +3,44 @@ body{
   background:#0f1115;
   color:#e6e6e6;
   font-family:'Inter', sans-serif;
+  min-height:100vh;
+  min-height:100dvh;
+  padding:
+    env(safe-area-inset-top)
+    env(safe-area-inset-right)
+    env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
+}
+
+#app-splash{
+  position:fixed;
+  inset:0;
+  z-index:100;
+  display:grid;
+  place-items:center;
+  background:#0f1115;
+  opacity:1;
+  visibility:visible;
+  transition:opacity 320ms ease, visibility 320ms ease;
+}
+
+body.app-ready #app-splash{
+  opacity:0;
+  visibility:hidden;
+}
+
+.splash-mark{
+  width:112px;
+  height:112px;
+  display:grid;
+  place-items:center;
+  border-radius:28px;
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.14);
+  color:#f8fbff;
+  font-size:34px;
+  font-weight:600;
+  box-shadow:0 24px 80px rgba(0,0,0,0.4);
 }
 
 button,
@@ -26,6 +64,7 @@ input:disabled{
 
 #drop-zone{
   min-height:100vh;
+  min-height:100dvh;
   display:grid;
   place-items:center;
   border:2px dashed rgba(255,255,255,0.2);
@@ -189,6 +228,16 @@ input:disabled{
   color:#fff;
   padding:10px 20px;
   border-radius:10px;
+}
+
+@media (display-mode: standalone){
+  .toolbar{
+    top:max(0px, env(safe-area-inset-top));
+  }
+
+  #document-meta{
+    padding-top:20px;
+  }
 }
 
 @media(max-width:768px){

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#0f1115"/>
+  <circle cx="256" cy="256" r="208" fill="#141a24"/>
+  <path d="M154 92h146l78 78v250H154z" fill="#f4f7fb" stroke="#8cc7ff" stroke-width="16"/>
+  <path d="M300 92v86h78" fill="#dbeafe" stroke="#8cc7ff" stroke-width="16"/>
+  <rect x="118" y="244" width="276" height="88" rx="22" fill="#c62828"/>
+  <text x="256" y="303" text-anchor="middle" font-family="Arial, sans-serif" font-size="50" font-weight="700" fill="#fff">PDF</text>
+  <text x="256" y="390" text-anchor="middle" font-family="Arial, sans-serif" font-size="32" font-weight="700" fill="#e6e6e6">HUSAINI</text>
+</svg>
