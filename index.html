@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#f5f5f5">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="HUSAINIREADER">
+  <title>HUSAINIREADER</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="manifest.webmanifest">
+</head>
+<body>
+
+  <div id="drop-zone">
+    <h2>HUSAINIREADER</h2>
+    <input type="file" id="file-input" accept="application/pdf">
+  </div>
+
+  <div id="loader" hidden>
+    Loading PDF...
+  </div>
+
+  <div id="document-meta" hidden>
+    <h2 id="document-title"></h2>
+    <p id="document-pages"></p>
+  </div>
+
+  <div id="viewer" hidden>
+
+    <div class="toolbar">
+      <button id="prev-page">Prev</button>
+      <input type="number" id="page-number" value="1">
+      <span id="page-count"></span>
+      <button id="next-page">Next</button>
+
+      <button id="zoom-out">-</button>
+      <span id="zoom-level">100%</span>
+      <button id="zoom-in">+</button>
+
+      <button id="fit-width">Fit Width</button>
+      <button id="rotate-page">Rotate</button>
+      <button id="download-pdf">
+        Download
+      </button>
+      <button id="print-pdf">
+        Print
+      </button>
+
+      <form id="search-form">
+        <input type="text" id="search-input" placeholder="Search text">
+        <button id="search-button">Search</button>
+      </form>
+    </div>
+
+    <p id="search-status" hidden></p>
+
+    <div class="reader-layout">
+      <div id="thumbnail-list"></div>
+      <div id="pdf-pages"></div>
+    </div>
+
+  </div>
+
+  <input type="file" id="empty-file-input" hidden>
+
+  <script type="module" src="app.js"></script>
+
+</body>
+</html>
