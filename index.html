@@ -10,9 +10,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="HUSAINIREADER">
   <title>HUSAINIREADER</title>
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
@@ -25,59 +24,162 @@
     <div class="splash-mark">HR</div>
   </div>
 
-  <div id="drop-zone">
-    <h2>HUSAINIREADER</h2>
-    <input type="file" id="file-input" accept="application/pdf">
-  </div>
+  <header class="app-header">
+    <div class="brand-lockup">
+      <span class="brand-chip">PDF</span>
+      <div>
+        <strong>HUSAINIREADER</strong>
+        <span>Advanced local PDF workspace</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <label class="upload-button">
+        <input type="file" id="file-input" accept="application/pdf" multiple>
+        Open PDFs
+      </label>
+      <button id="command-palette-button">Command</button>
+    </div>
+  </header>
+
+  <nav id="document-tabs" class="document-tabs" aria-label="Open PDF documents"></nav>
+
+  <section id="drop-zone" class="drop-zone">
+    <div class="drop-card">
+      <h1>Premium PDF reading, entirely local.</h1>
+      <p>Open one or more PDFs to browse, annotate, bookmark, summarize, and restore later on this device.</p>
+      <label class="upload-button large">
+        <input type="file" id="empty-file-input" accept="application/pdf" multiple>
+        Choose PDF files
+      </label>
+    </div>
+  </section>
 
   <div id="loader" hidden>
-    Loading PDF...
+    <span></span>
+    <strong>Loading PDF...</strong>
   </div>
 
-  <div id="document-meta" hidden>
-    <h2 id="document-title"></h2>
-    <p id="document-pages"></p>
-  </div>
+  <main id="workspace" class="workspace" hidden>
+    <aside class="left-rail">
+      <section class="rail-panel">
+        <div class="panel-heading">
+          <h2>Pages</h2>
+          <button id="toggle-thumbnails" title="Toggle thumbnails">Hide</button>
+        </div>
+        <div id="thumbnail-list"></div>
+      </section>
+      <section class="rail-panel">
+        <div class="panel-heading">
+          <h2>Bookmarks</h2>
+          <button id="bookmark-page">Add</button>
+        </div>
+        <div id="bookmark-list" class="stack-list"></div>
+      </section>
+    </aside>
 
-  <div id="viewer" hidden>
+    <section class="reader-column">
+      <div id="document-meta" class="document-meta" hidden>
+        <div>
+          <h2 id="document-title"></h2>
+          <p id="document-pages"></p>
+        </div>
+        <div class="progress-shell">
+          <span id="reading-progress-label">0%</span>
+          <div class="progress-track"><i id="reading-progress-bar"></i></div>
+        </div>
+      </div>
 
-    <div class="toolbar">
-      <button id="prev-page">Prev</button>
-      <input type="number" id="page-number" value="1">
-      <span id="page-count"></span>
-      <button id="next-page">Next</button>
+      <div class="toolbar" id="toolbar">
+        <div class="toolbar-group">
+          <button id="prev-page">Prev</button>
+          <input type="number" id="page-number" value="1" min="1">
+          <span id="page-count"></span>
+          <button id="next-page">Next</button>
+        </div>
+        <div class="toolbar-group">
+          <button id="zoom-out">-</button>
+          <span id="zoom-level">100%</span>
+          <button id="zoom-in">+</button>
+          <button id="fit-width">Fit width</button>
+          <button id="fit-page">Fit page</button>
+          <button id="rotate-page">Rotate</button>
+        </div>
+        <div class="toolbar-group">
+          <button id="toggle-view-mode">Horizontal</button>
+          <button id="reading-mode">Reading</button>
+          <button id="dark-mode">Theme</button>
+          <button id="fullscreen-mode">Fullscreen</button>
+        </div>
+        <form id="search-form" class="toolbar-search">
+          <input type="text" id="search-input" placeholder="Search inside PDF">
+          <button id="search-button">Search</button>
+        </form>
+      </div>
 
-      <button id="zoom-out">-</button>
-      <span id="zoom-level">100%</span>
-      <button id="zoom-in">+</button>
+      <p id="search-status" hidden></p>
 
-      <button id="fit-width">Fit Width</button>
-      <button id="rotate-page">Rotate</button>
-      <button id="download-pdf">
-        Download
-      </button>
-      <button id="print-pdf">
-        Print
-      </button>
+      <div class="annotation-toolbar">
+        <button id="highlight-selection">Highlight</button>
+        <button id="underline-selection">Underline</button>
+        <button id="toggle-pen">Pen</button>
+        <button id="add-note">Note</button>
+        <button id="copy-page-text">Copy text</button>
+        <button id="download-pdf">Download</button>
+        <button id="print-pdf">Print</button>
+      </div>
 
-      <form id="search-form">
-        <input type="text" id="search-input" placeholder="Search text">
-        <button id="search-button">Search</button>
-      </form>
-    </div>
+      <div id="pdf-pages" aria-live="polite"></div>
+    </section>
 
-    <p id="search-status" hidden></p>
+    <aside class="right-rail">
+      <section class="rail-panel">
+        <div class="panel-heading">
+          <h2>Insights</h2>
+          <button id="refresh-insights">Refresh</button>
+        </div>
+        <div class="stats-grid">
+          <article><span>Reading</span><strong id="reading-time">0 min</strong></article>
+          <article><span>Words</span><strong id="word-count">0</strong></article>
+        </div>
+        <div id="keyword-summary" class="insight-block"></div>
+        <div id="toc-list" class="stack-list"></div>
+      </section>
+      <section class="rail-panel">
+        <div class="panel-heading">
+          <h2>Notes</h2>
+          <button id="clear-notes">Clear</button>
+        </div>
+        <div id="notes-list" class="stack-list"></div>
+      </section>
+      <section class="rail-panel">
+        <div class="panel-heading">
+          <h2>Recent</h2>
+        </div>
+        <div id="recent-files" class="stack-list"></div>
+      </section>
+    </aside>
+  </main>
 
-    <div class="reader-layout">
-      <div id="thumbnail-list"></div>
-      <div id="pdf-pages"></div>
-    </div>
+  <button id="mobile-fab" class="mobile-fab">Tools</button>
 
-  </div>
+  <dialog id="command-palette" class="command-palette">
+    <form method="dialog">
+      <input id="command-query" type="search" placeholder="Type a command">
+      <div id="command-results"></div>
+      <button value="cancel">Close</button>
+    </form>
+  </dialog>
 
-  <input type="file" id="empty-file-input" hidden>
+  <template id="page-template">
+    <section class="pdf-page">
+      <canvas class="pdf-page-canvas"></canvas>
+      <div class="annotation-layer"></div>
+      <canvas class="ink-layer"></canvas>
+      <div class="textLayer"></div>
+      <span class="page-label"></span>
+    </section>
+  </template>
 
-  <script type="module" src="app.js"></script>
-
+  <script type="module" src="app.js?v=20260517-phase1"></script>
 </body>
 </html>

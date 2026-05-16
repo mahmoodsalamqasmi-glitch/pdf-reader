@@ -1,10 +1,21 @@
-const STATIC_CACHE = "husainireader-static-v2";
-const RUNTIME_CACHE = "husainireader-runtime-v2";
+const STATIC_CACHE = "husainireader-static-v5";
+const RUNTIME_CACHE = "husainireader-runtime-v5";
 const APP_FILES = [
   "./",
   "./index.html",
   "./styles.css",
   "./app.js",
+  "./app.js?v=20260517-phase1",
+  "./src/modules/storage.js",
+  "./src/modules/insights.js",
+  "./src/modules/annotations.js",
+  "./src/core/page-store.js",
+  "./src/core/render-queue.js",
+  "./src/core/viewport-manager.js",
+  "./src/core/virtualization-engine.js",
+  "./src/viewer/continuous-scroll.js",
+  "./src/viewer/zoom-manager.js",
+  "./src/viewer/thumbnail-sidebar.js",
   "./manifest.webmanifest",
   "./icon.svg",
   "./icon-maskable.svg",
