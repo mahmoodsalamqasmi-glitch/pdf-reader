@@ -19,6 +19,7 @@ export class ZoomManager {
     this.onZoom = onZoom;
     this.pendingScale = null;
     this.frame = null;
+    this.previewScaleValue = 1;
   }
 
   setScaleAndInvalidate(nextScale) {
@@ -31,10 +32,15 @@ export class ZoomManager {
       this.setScale(this.pendingScale);
       this.renderQueue?.cancelAll();
       this.pageStore.forEach((item) => {
-        this.viewportManager.applyPageSize(item);
+        if (item.page) {
+          this.viewportManager.applyPageSize(item);
+        }
         item.renderedScale = 0;
         item.renderedRotation = null;
         item.renderVersion += 1;
+        if (this.virtualizationEngine?.shouldRender(item.pageNumber)) {
+          item.shell.classList.add("rerendering");
+        }
       });
       this.virtualizationEngine?.rerenderVisible();
       this.onZoom?.();
@@ -43,6 +49,33 @@ export class ZoomManager {
 
   change(delta) {
     this.setScaleAndInvalidate(this.getScale() + delta);
+  }
+
+  previewScale(nextScale) {
+    const clamped = Math.min(Math.max(nextScale, 0.45), 4);
+    this.previewScaleValue = clamped / this.getScale();
+
+    this.pageStore.forEach((item) => {
+      if (!this.virtualizationEngine?.shouldRender(item.pageNumber)) return;
+      if (!item.shell.classList.contains("rendered")) return;
+      item.shell.style.setProperty("--zoom-preview-scale", this.previewScaleValue);
+      item.shell.classList.add("zoom-preview");
+    });
+
+    this.onZoom?.(clamped);
+    return clamped;
+  }
+
+  clearPreview() {
+    this.pageStore.forEach((item) => {
+      item.shell.classList.remove("zoom-preview");
+      item.shell.style.removeProperty("--zoom-preview-scale");
+    });
+  }
+
+  commitPreviewScale(nextScale) {
+    this.clearPreview();
+    this.setScaleAndInvalidate(nextScale);
   }
 
   fitWidth() {

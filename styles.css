@@ -364,6 +364,8 @@ input:disabled{
 
 .reader-column{
   min-width:0;
+  overflow-x:auto;
+  overscroll-behavior-inline:contain;
 }
 
 .document-meta{
@@ -444,7 +446,8 @@ body.toolbar-hidden .toolbar{
 }
 
 #pdf-pages{
-  min-width:0;
+  min-width:100%;
+  width:max-content;
   display:flex;
   flex-direction:column;
   align-items:center;
@@ -463,11 +466,23 @@ body.mode-horizontal #pdf-pages{
 
 .pdf-page{
   position:relative;
-  max-width:100%;
+  max-width:none;
   overflow:hidden;
   background:#fff;
   box-shadow:0 18px 45px rgba(0,0,0,0.4);
   scroll-snap-align:start;
+  transform-origin:center top;
+  transition:box-shadow 180ms ease, opacity 180ms ease;
+}
+
+.pdf-page.zoom-preview{
+  transform:scale(var(--zoom-preview-scale));
+  z-index:2;
+  will-change:transform;
+}
+
+.pdf-page.rerendering .pdf-page-canvas{
+  opacity:0.42;
 }
 
 .pdf-page:not(.rendered)::before{
@@ -483,8 +498,10 @@ body.mode-horizontal #pdf-pages{
 .pdf-page-canvas,
 .ink-layer{
   display:block;
-  max-width:100%;
+  max-width:none;
   height:auto;
+  image-rendering:auto;
+  transition:opacity 140ms ease;
 }
 
 .annotation-layer,
@@ -716,6 +733,7 @@ body.hide-thumbs #thumbnail-list{
 
   #pdf-pages{
     gap:16px;
+    min-width:100%;
   }
 
   .mobile-fab{

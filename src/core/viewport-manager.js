@@ -21,9 +21,7 @@ export class ViewportManager {
   }
 
   outputScale() {
-    const isMobile = window.matchMedia("(max-width: 860px)").matches;
-    const maxScale = isMobile ? 2 : 3;
-    return Math.min(window.devicePixelRatio || 1, maxScale);
+    return window.devicePixelRatio || 1;
   }
 
   applyPageSize(item, scale = this.getScale()) {

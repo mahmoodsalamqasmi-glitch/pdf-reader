@@ -162,7 +162,7 @@ engine.zoomManager = new ZoomManager({
   pageStore: engine.pageStore,
   renderQueue: engine.renderQueue,
   virtualizationEngine: engine.virtualizationEngine,
-  onZoom: updateDocumentMeta
+  onZoom: updateZoomLabel
 });
 
 engine.thumbnailSidebar = new ThumbnailSidebar({
@@ -233,8 +233,12 @@ function updateDocumentMeta() {
   elements.pageCount.textContent = `/ ${doc.pdf.numPages}`;
   elements.pageNumber.max = doc.pdf.numPages;
   elements.pageNumber.value = state.pageNumber;
-  elements.zoomLevel.textContent = `${Math.round(state.scale * 100)}%`;
+  updateZoomLabel();
   updateReadingProgress();
+}
+
+function updateZoomLabel(scale = state.scale) {
+  elements.zoomLevel.textContent = `${Math.round(scale * 100)}%`;
 }
 
 function updateReadingProgress() {
@@ -321,10 +325,22 @@ async function renderTextLayer(page, container, viewport) {
 }
 
 function resizeDrawingCanvas(canvas, viewport, outputScale) {
-  canvas.width = Math.floor(viewport.width * outputScale);
-  canvas.height = Math.floor(viewport.height * outputScale);
+  canvas.width = viewport.width * outputScale;
+  canvas.height = viewport.height * outputScale;
   canvas.style.width = `${viewport.width}px`;
   canvas.style.height = `${viewport.height}px`;
+}
+
+function createRenderCanvas(viewport, outputScale) {
+  const canvas = document.createElement("canvas");
+  canvas.className = "pdf-page-canvas";
+  canvas.width = viewport.width * outputScale;
+  canvas.height = viewport.height * outputScale;
+  canvas.style.width = `${viewport.width}px`;
+  canvas.style.height = `${viewport.height}px`;
+  canvas.dataset.renderScale = String(state.scale);
+  canvas.dataset.outputScale = String(outputScale);
+  return canvas;
 }
 
 async function renderPage(pageNumber) {
@@ -341,16 +357,14 @@ async function renderPage(pageNumber) {
   item.renderVersion = renderVersion;
   const viewport = engine.viewportManager.applyPageSize(item);
   const outputScale = engine.viewportManager.outputScale();
-  const { canvas, annotationLayer, inkLayer, textLayer } = item;
-  const context = canvas.getContext("2d", { alpha: false });
+  const { annotationLayer, inkLayer, textLayer } = item;
+  const nextCanvas = createRenderCanvas(viewport, outputScale);
+  const context = nextCanvas.getContext("2d", { alpha: false });
+  context.imageSmoothingEnabled = true;
+  context.imageSmoothingQuality = "high";
 
-  canvas.width = Math.floor(viewport.width * outputScale);
-  canvas.height = Math.floor(viewport.height * outputScale);
-  canvas.style.width = `${viewport.width}px`;
-  canvas.style.height = `${viewport.height}px`;
   context.setTransform(outputScale, 0, 0, outputScale, 0, 0);
   context.clearRect(0, 0, viewport.width, viewport.height);
-  resizeDrawingCanvas(inkLayer, viewport, outputScale);
 
   const task = item.page.render({ canvasContext: context, viewport });
   engine.renderQueue.setTask(pageNumber, task);
@@ -360,12 +374,16 @@ async function renderPage(pageNumber) {
     engine.renderQueue.deleteTask(pageNumber);
   }
   if (item.renderVersion !== renderVersion) return;
+  item.canvas.replaceWith(nextCanvas);
+  item.canvas = nextCanvas;
+  resizeDrawingCanvas(inkLayer, viewport, outputScale);
   await renderTextLayer(item.page, textLayer, viewport);
   if (item.renderVersion !== renderVersion) return;
 
   item.renderedScale = state.scale;
   item.renderedRotation = state.rotation;
   item.shell.classList.add("rendered");
+  item.shell.classList.remove("rerendering");
   renderMarks(pageNumber, annotationLayer);
   renderInk(pageNumber, inkLayer, viewport, outputScale);
 }
@@ -383,6 +401,7 @@ function unloadPage(pageNumber) {
   item.textLayer.replaceChildren();
   item.renderedScale = 0;
   item.shell.classList.remove("rendered");
+  item.shell.classList.remove("rerendering");
 }
 
 function rerenderVisiblePages() {
@@ -901,7 +920,22 @@ function wireGestures() {
   elements.pages.addEventListener("touchmove", (event) => {
     if (event.touches.length !== 2 || !state.touch.pinchDistance) return;
     const distance = touchDistance(event);
-    engine.zoomManager.setScaleAndInvalidate(state.touch.pinchScale * (distance / state.touch.pinchDistance));
+    engine.zoomManager.previewScale(state.touch.pinchScale * (distance / state.touch.pinchDistance));
+  }, { passive: true });
+
+  const commitPinchZoom = () => {
+    if (!state.touch.pinchDistance) return;
+    const previewScale = state.scale * engine.zoomManager.previewScaleValue;
+    state.fitMode = "custom";
+    state.touch.pinchDistance = 0;
+    engine.zoomManager.commitPreviewScale(previewScale);
+  };
+
+  elements.pages.addEventListener("touchend", commitPinchZoom, { passive: true });
+  elements.pages.addEventListener("touchcancel", () => {
+    state.touch.pinchDistance = 0;
+    engine.zoomManager.clearPreview();
+    updateZoomLabel();
   }, { passive: true });
 }
 

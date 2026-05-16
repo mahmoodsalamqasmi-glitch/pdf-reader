@@ -63,10 +63,12 @@ export class ThumbnailSidebar {
     const outputScale = Math.min(window.devicePixelRatio || 1, 2);
     const context = canvas.getContext("2d", { alpha: false });
 
-    canvas.width = Math.floor(viewport.width * outputScale);
-    canvas.height = Math.floor(viewport.height * outputScale);
+    canvas.width = Math.ceil(viewport.width * outputScale);
+    canvas.height = Math.ceil(viewport.height * outputScale);
     canvas.style.width = `${viewport.width}px`;
     canvas.style.height = `${viewport.height}px`;
+    context.imageSmoothingEnabled = true;
+    context.imageSmoothingQuality = "high";
     context.setTransform(outputScale, 0, 0, outputScale, 0, 0);
     await page.render({ canvasContext: context, viewport }).promise;
   }

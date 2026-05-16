@@ -1,11 +1,11 @@
-const STATIC_CACHE = "husainireader-static-v5";
-const RUNTIME_CACHE = "husainireader-runtime-v5";
+const STATIC_CACHE = "husainireader-static-v7";
+const RUNTIME_CACHE = "husainireader-runtime-v7";
 const APP_FILES = [
   "./",
   "./index.html",
   "./styles.css",
   "./app.js",
-  "./app.js?v=20260517-phase1",
+  "./app.js?v=20260517-sharpzoom2",
   "./src/modules/storage.js",
   "./src/modules/insights.js",
   "./src/modules/annotations.js",
