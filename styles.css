@@ -473,6 +473,7 @@ body.mode-horizontal #pdf-pages{
   scroll-snap-align:start;
   transform-origin:center top;
   transition:box-shadow 180ms ease, opacity 180ms ease;
+  contain:layout paint style;
 }
 
 .pdf-page.zoom-preview{
@@ -502,6 +503,7 @@ body.mode-horizontal #pdf-pages{
   height:auto;
   image-rendering:auto;
   transition:opacity 140ms ease;
+  backface-visibility:hidden;
 }
 
 .annotation-layer,

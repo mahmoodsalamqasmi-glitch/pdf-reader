@@ -30,7 +30,7 @@ export class ZoomManager {
     this.frame = requestAnimationFrame(() => {
       this.frame = null;
       this.setScale(this.pendingScale);
-      this.renderQueue?.cancelAll();
+      this.renderQueue?.invalidate();
       this.pageStore.forEach((item) => {
         if (item.page) {
           this.viewportManager.applyPageSize(item);

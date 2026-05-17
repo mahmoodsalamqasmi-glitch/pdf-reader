@@ -327,8 +327,8 @@ async function renderTextLayer(page, container, viewport) {
 function resizeDrawingCanvas(canvas, viewport, outputScale) {
   canvas.width = viewport.width * outputScale;
   canvas.height = viewport.height * outputScale;
-  canvas.style.width = `${viewport.width}px`;
-  canvas.style.height = `${viewport.height}px`;
+  canvas.style.width = `${canvas.width / outputScale}px`;
+  canvas.style.height = `${canvas.height / outputScale}px`;
 }
 
 function createRenderCanvas(viewport, outputScale) {
@@ -336,14 +336,14 @@ function createRenderCanvas(viewport, outputScale) {
   canvas.className = "pdf-page-canvas";
   canvas.width = viewport.width * outputScale;
   canvas.height = viewport.height * outputScale;
-  canvas.style.width = `${viewport.width}px`;
-  canvas.style.height = `${viewport.height}px`;
+  canvas.style.width = `${canvas.width / outputScale}px`;
+  canvas.style.height = `${canvas.height / outputScale}px`;
   canvas.dataset.renderScale = String(state.scale);
   canvas.dataset.outputScale = String(outputScale);
   return canvas;
 }
 
-async function renderPage(pageNumber) {
+async function renderPage(pageNumber, queueGeneration = engine.renderQueue.generation) {
   const item = engine.pageStore.get(pageNumber);
   if (!item) return;
   if (item.renderedScale === state.scale && item.renderedRotation === state.rotation) return;
@@ -373,11 +373,13 @@ async function renderPage(pageNumber) {
   } finally {
     engine.renderQueue.deleteTask(pageNumber);
   }
+  if (queueGeneration !== engine.renderQueue.generation) return;
   if (item.renderVersion !== renderVersion) return;
   item.canvas.replaceWith(nextCanvas);
   item.canvas = nextCanvas;
   resizeDrawingCanvas(inkLayer, viewport, outputScale);
   await renderTextLayer(item.page, textLayer, viewport);
+  if (queueGeneration !== engine.renderQueue.generation) return;
   if (item.renderVersion !== renderVersion) return;
 
   item.renderedScale = state.scale;
@@ -582,7 +584,7 @@ function wireInk(canvas, pageNumber) {
     points.push({ x: (event.clientX - rect.left) / rect.width, y: (event.clientY - rect.top) / rect.height });
     const item = engine.pageStore.get(pageNumber);
     const viewport = pageViewport(item.page);
-    renderInk(pageNumber, canvas, viewport, Math.min(window.devicePixelRatio || 1, 3));
+    renderInk(pageNumber, canvas, viewport, window.devicePixelRatio || 1);
     const ctx = canvas.getContext("2d");
     ctx.beginPath();
     points.forEach((point, index) => {
@@ -845,7 +847,7 @@ function wireActions() {
   elements.fitPage.addEventListener("click", fitPage);
   elements.rotatePage.addEventListener("click", () => {
     state.rotation = (state.rotation + 90) % 360;
-    engine.renderQueue.cancelAll();
+    engine.renderQueue.invalidate();
     rerenderVisiblePages();
   });
   elements.toggleViewMode.addEventListener("click", () => {
